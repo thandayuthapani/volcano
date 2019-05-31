@@ -111,15 +111,11 @@ func (pp *proportionPlugin) OnSessionOpen(ssn *framework.Session) {
 
 		// If no queues, break
 		if totalWeight == 0 {
-			glog.V(4).Infof("Exiting when total weight is 0")
 			break
 		}
 
 		// Calculates the deserved of each Queue.
-		// increasedDeserved is the increased value for attr.deserved of processed queues
-		// decreasedDeserved is the decreased value for attr.deserved of processed queues
-		increasedDeserved := api.EmptyResource()
-		decreasedDeserved := api.EmptyResource()
+		deserved := api.EmptyResource()
 		for _, attr := range pp.queueOpts {
 			glog.V(4).Infof("Considering Queue <%s>: weight <%d>, total weight <%d>.",
 				attr.name, attr.weight, totalWeight)
@@ -129,26 +125,20 @@ func (pp *proportionPlugin) OnSessionOpen(ssn *framework.Session) {
 
 			oldDeserved := attr.deserved.Clone()
 			attr.deserved.Add(remaining.Clone().Multi(float64(attr.weight) / float64(totalWeight)))
-
-			if attr.request.Less(attr.deserved) {
+			if !attr.deserved.LessEqual(attr.request) {
 				attr.deserved = helpers.Min(attr.deserved, attr.request)
 				meet[attr.queueID] = struct{}{}
-				glog.V(4).Infof("queue <%s> is meet", attr.name)
-
 			}
 			pp.updateShare(attr)
 
 			glog.V(4).Infof("The attributes of queue <%s> in proportion: deserved <%v>, allocate <%v>, request <%v>, share <%0.2f>",
 				attr.name, attr.deserved, attr.allocated, attr.request, attr.share)
 
-			increased, decreased := attr.deserved.Diff(oldDeserved)
-			increasedDeserved.Add(increased)
-			decreasedDeserved.Add(decreased)
+			deserved.Add(attr.deserved.Clone().Sub(oldDeserved))
 		}
 
-		remaining.Sub(increasedDeserved).Add(decreasedDeserved)
+		remaining.Sub(deserved)
 		if remaining.IsEmpty() {
-			glog.V(4).Infof("Exiting when remaining is empty:  <%v>", remaining)
 			break
 		}
 	}
@@ -206,19 +196,6 @@ func (pp *proportionPlugin) OnSessionOpen(ssn *framework.Session) {
 		}
 
 		return overused
-	})
-
-	ssn.AddJobEnqueueableFn(pp.Name(), func(obj interface{}) bool {
-		job := obj.(*api.JobInfo)
-		queueID := job.Queue
-		attr := pp.queueOpts[queueID]
-		queue := ssn.Queues[queueID]
-		pgResource := api.NewResource(*job.PodGroup.Spec.MinResources)
-		// The queue resource quota limit has not reached
-		if pgResource.Clone().Add(attr.allocated).LessEqual(api.NewResource(queue.Queue.Spec.Capability)) {
-			return true
-		}
-		return false
 	})
 
 	// Register event handlers.
