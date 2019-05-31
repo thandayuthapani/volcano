@@ -17,12 +17,12 @@ limitations under the License.
 package e2e
 
 import (
-	"fmt"
+	//	"fmt"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	//	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	//	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Queue E2E Test", func() {
