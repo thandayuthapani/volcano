@@ -214,6 +214,10 @@ func (pp *proportionPlugin) OnSessionOpen(ssn *framework.Session) {
 		attr := pp.queueOpts[queueID]
 		queue := ssn.Queues[queueID]
 		pgResource := api.NewResource(*job.PodGroup.Spec.MinResources)
+
+		if queue.Queue.Spec.Capability == nil {
+			return true
+		}
 		// The queue resource quota limit has not reached
 		if pgResource.Clone().Add(attr.allocated).LessEqual(api.NewResource(queue.Queue.Spec.Capability)) {
 			return true
