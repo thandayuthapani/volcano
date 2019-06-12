@@ -79,7 +79,7 @@ var _ = Describe("Job E2E Test", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("Gang scheduling", func() {
+	FIt("Gang scheduling", func() {
 		context := initTestContext()
 		defer cleanupTestContext(context)
 		rep := clusterSize(context, oneCPU)/2 + 1
