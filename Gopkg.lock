@@ -204,7 +204,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4281fb8a5ed4671cd7e80c85599e00912f796819716abaefd697797ec9eb4491"
+  digest = "1:63c04b7effb2d164595f6d4ba30160fafd8cede82c743a2077a65921ae62e06b"
   name = "github.com/kubernetes-sigs/kube-batch"
   packages = [
     "cmd/kube-batch/app",
@@ -244,10 +244,11 @@
     "pkg/scheduler/plugins/proportion",
     "pkg/scheduler/plugins/util",
     "pkg/scheduler/util",
+    "pkg/scheduler/util/assert",
     "pkg/version",
   ]
   pruneopts = "UT"
-  revision = "700381278a3e7da396507055d371dd93c1724322"
+  revision = "0302d83f20a6bb9cff8a27f9d95fd69d0d84ab28"
   source = "https://github.com/volcano-sh/scheduler"
 
 [[projects]]
@@ -1094,6 +1095,7 @@
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "golang.org/x/crypto/ssh",
+    "golang.org/x/time/rate",
     "k8s.io/api/admission/v1beta1",
     "k8s.io/api/admissionregistration/v1beta1",
     "k8s.io/api/apps/v1",
