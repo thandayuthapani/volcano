@@ -369,7 +369,8 @@ func getJobID(pg *kbapi.PodGroup) kbapi.JobID {
 func (sc *SchedulerCache) setPodGroup(ss *kbapi.PodGroup) error {
 	job := getJobID(ss)
 
-	if len(job) == 0 {
+	// Even if name and namespace are nil, we will get "/" as jobID, checking whether len(jobID)==1, because checking it for 0 will return false always.
+	if len(job) == 1 {
 		return fmt.Errorf("the identity of PodGroup is empty")
 	}
 
